@@ -56,5 +56,10 @@ npm run dev
 ## Testing
 1. Abrir terminal de la carpeta "back", ejecutar
 ```bash
-npm test
+npx ts-jest config:init 
+``` 
+
+2. Luego:
+```bash
+npm t
 ``` 
