@@ -1,0 +1,11 @@
+# Ignorar directorios específicos
+**/node_modules/
+**/dist/
+
+# Ignorar archivos de configuración sensibles
+**/.env
+
+# Ignorar archivos específicos
+**/*.log
+
+.vscode
