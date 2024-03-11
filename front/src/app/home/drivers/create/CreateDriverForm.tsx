@@ -7,7 +7,7 @@ import { Form, FormField, FormItem, FormControl, FormLabel, FormDescription, For
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
-import { REVandREDdrivers} from "../../../lib/actions"
+import { revalidateDrivers, redirectToDrivers } from "../../../lib/actions"
 import Swal from "sweetalert2"
 import {
     Select,
@@ -47,13 +47,13 @@ export default function CreateTripForm({licenseTypes}: CreateDriverFormProps) {
 
     const handleSubmitNewDriver = async (formData: z.infer<typeof formSchema>) => {
         try {
-            const { data } = await axios.post('http://localhost:3001/drivers/create', {
+            const { data } = await axios.post('http://localhost:3001/drivers', {
             ...formData,
             driven_km: 0
             })
             
             if(data.status === 'success') {
-                REVandREDdrivers();
+                redirectToDrivers();
                 Swal.fire({
                     title: 'Driver created successfully',
                     icon: 'success',

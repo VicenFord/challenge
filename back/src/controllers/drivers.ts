@@ -16,12 +16,14 @@ interface Driver {
     
 const getAllDrivers = async () => { 
 
-    try {        
+    try {
+
         const [result] = await db.query(`SELECT 
         d.id, d.name, d.surname, d.dni, d.driven_km, l.id AS license, l.emission_date, lt.years_active, lt.type FROM drivers AS d
         INNER JOIN licenses AS l ON d.id = l.driver_id
         INNER JOIN license_types AS lt ON l.license_type = lt.id
         `);
+        
         
         result.map((driver: Driver) => {
             driver.id = Buffer.from(driver?.id).toString('hex')
@@ -57,24 +59,58 @@ const createDriver = async ({ name, surname, dni, driven_km, license_type, emiss
     
     try {
         const [driver] = await db.query(`INSERT INTO drivers (name, surname, dni, driven_km) VALUES ('${name}', '${surname}', '${dni}', ${driven_km})`)
-        const [fetchDriver] = await db.query(`SELECT * FROM drivers WHERE name = '${name}' AND surname = '${surname}' AND dni = '${dni}'`)
-        
-        const [license] = await db.query(`INSERT INTO licenses (license_type, driver_id, emission_date) VALUES (UNHEX('${license_type}'), UNHEX('${Buffer.from(fetchDriver[0]?.id).toString('hex')}'), '${emission_date}')`)
-        const [fetchLicense] = await db.query(`SELECT * FROM licenses WHERE driver_id = UNHEX('${Buffer.from(fetchDriver[0]?.id).toString('hex')}')`)
 
-        if(fetchLicense.length > 0) {
+        if (driver.affectedRows === 1){
+            const [fetchDriver] = await db.query(`SELECT * FROM drivers WHERE name = '${name}' AND surname = '${surname}' AND dni = '${dni}'`)
+            
+            try {
+                const [license] = await db.query(`INSERT INTO licenses (license_type, driver_id, emission_date) VALUES (UNHEX('${license_type}'), UNHEX('${Buffer.from(fetchDriver[0]?.id).toString('hex')}'), '${emission_date}')`)
+                if(license.affectedRows === 1) {
+                    return{
+                        status: 'success',
+                        message: 'Driver created successfully',
+                    }
+                } else {
+                    return{
+                        status: 'error',
+                        message: `Error creating driver's license`
+                    }
+                }
+            } catch (error) {
+                return{
+                    status: 'error',
+                    error: error
+                }
+            }            
+        }else{
+            return{
+                status: 'error',
+                message: 'Error creating driver'
+            }
+        }        
+    } catch (error: unknown) {
+        return{
+            status: 'error',
+            error: error
+        }
+    }
+}
+
+const renewLicense = async (id:string, today: string) => {
+
+    try {
+        const [renewLicense] = await db.query(`UPDATE licenses SET emission_date = '${today}' WHERE driver_id = UNHEX("${id}")`)
+        if(renewLicense.affectedRows === 1) {
             return{
                 status: 'success',
-                message: 'Driver created successfully',
+                message: 'License renewed successfully',
             }
         }
 
         return{
             status: 'error',
-            message: 'Error creating driver'
+            message: 'Error renewing license'
         }
-        
-        
     } catch (error: unknown) {
         return{
             status: 'error',
@@ -88,7 +124,27 @@ const deleteDriver = async (id: string) => {
         const [resultLicense] = await db.query(`DELETE FROM licenses WHERE driver_id = UNHEX("${id}")`)
         const [result] = await db.query(`DELETE FROM drivers WHERE id = UNHEX("${id}")`)
         
-        if(result) {
+        if(result.affectedRows === 1) {
+            return{
+                status: 'success',
+                message: 'Driver deleted successfully',
+            }
+        }
+    } catch (error: any) {
+        return{
+            status: 'error',
+            error: error.message
+        }
+    }
+}
+
+const deleteDriverAndTrips = async (id: string) => {
+    try {
+        const [resultTrip] = await db.query(`DELETE FROM trips WHERE driver_id = UNHEX("${id}")`)
+        const [resultLicense] = await db.query(`DELETE FROM licenses WHERE driver_id = UNHEX("${id}")`)
+        const [resultDriver] = await db.query(`DELETE FROM drivers WHERE id = UNHEX("${id}")`)
+        
+        if(resultDriver.affectedRows === 1) {
             return{
                 status: 'success',
                 message: 'Driver deleted successfully',
@@ -117,5 +173,7 @@ const isAvailableToDrive = (emission_date: any, years_active: any) => {
 module.exports = {
     getAllDrivers,
     createDriver,
-    deleteDriver
+    deleteDriver,
+    deleteDriverAndTrips,
+    renewLicense,
 }

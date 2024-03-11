@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormControl, FormLabel, FormDescription, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { revalidateVehicles } from "../../../lib/actions"
+import { redirectToVehicles } from "../../../lib/actions"
 import Swal from "sweetalert2"
 import {
     Select,
@@ -58,7 +58,7 @@ export default function CreateVehicleForm({carBrands}: CreateVehicleFormProps) {
             })
             
             if(data.status === 'success') {
-                revalidateVehicles();
+                redirectToVehicles();
                 Swal.fire({
                     title: 'Vehicle created successfully',
                     icon: 'success',
@@ -87,7 +87,7 @@ export default function CreateVehicleForm({carBrands}: CreateVehicleFormProps) {
                         <FormControl>
                             <Select onValueChange={field.onChange}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a driver" />
+                                    <SelectValue placeholder="Select a car brand" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {carBrands.map((brand: any) => (

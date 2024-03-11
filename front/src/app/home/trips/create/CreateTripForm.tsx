@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormControl, FormLabel, FormDescription, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { revalidateAll, redirectToTrips, onlyRevalidateUsage } from "../../../lib/actions"
+import { redirectToTrips } from "../../../lib/actions"
 import Swal from "sweetalert2"
 import {
     Select,
@@ -41,16 +41,13 @@ export default function CreateTripForm({drivers, cars}: CreateTripFormProps) {
 
     const handleSubmitNewTrip = async (formData: z.infer<typeof formSchema>) => {
         try {
-            const { data } = await axios.post('http://localhost:3001/trips/create', {
+            const { data } = await axios.post('http://localhost:3001/trips', {
             ...formData,
             date: new Date().toISOString().split('T')[0],
             hour: new Date().getHours(),
             minutes: new Date().getMinutes()
             })
-            
             if(data.status === 'success') {
-                revalidateAll();
-                onlyRevalidateUsage()
                 redirectToTrips();
                 Swal.fire({
                     title: 'Trip created successfully',

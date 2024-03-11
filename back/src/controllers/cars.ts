@@ -68,21 +68,21 @@ const createNewCar = async ({ plate, brand_id, model, year, km }: Car) => {
         }
     }
 }
-
-const deleteCar = async (id: string) => {
+const deleteCarAndTrips = async (id: string) => {
     try {
-        const [result] = await db.query(`DELETE FROM cars WHERE id = UNHEX("${id}")`)
+        const [resultTrip] = await db.query(`DELETE FROM trips WHERE car_id = UNHEX("${id}")`)
+        const [resultCar] = await db.query(`DELETE FROM cars WHERE id = UNHEX("${id}")`)
         
-        if(result) {
+        if(resultCar.affectedRows === 1) {
             return{
                 status: 'success',
-                message: 'Car deleted successfully',
+                message: 'Car and trips deleted successfully',
             }
         }
 
         return{
             status: 'error',
-            message: 'Error deleting car'
+            message: 'Error deleting car and trips'
         }
     } catch (error: any) {
         return{
@@ -119,6 +119,6 @@ const repairCar = async (id: string) => {
 module.exports = {
     getAllCars,
     createNewCar,
-    deleteCar,
+    deleteCarAndTrips,
     repairCar,
 }

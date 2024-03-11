@@ -1,3 +1,4 @@
+"use server"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { MoveLeft } from "lucide-react"

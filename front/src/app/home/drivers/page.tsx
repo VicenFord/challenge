@@ -1,3 +1,4 @@
+"use server"
 import axios from "axios"
 import { Drivers, columns } from "./columns"
 import { DataTable } from "./data-table"

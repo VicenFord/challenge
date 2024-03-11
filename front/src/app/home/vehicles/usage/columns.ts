@@ -27,7 +27,7 @@ export const columns: ColumnDef<Ratio>[] = [
     },
     {
       accessorKey: "total_km_combined",
-      header: "Total driven KMs"
+      header: "Total KMs driven",
     },
     {
      accessorKey: "drivers",

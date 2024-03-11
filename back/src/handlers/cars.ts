@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-const { getAllCars, createNewCar, deleteCar, repairCar } = require('../controllers/cars');
+const { getAllCars, createNewCar, deleteCarAndTrips, repairCar,  } = require('../controllers/cars');
 
 const handleGetAllCars = async (req: Request, res: Response) => {
     try {
@@ -36,10 +36,10 @@ const handleCreateNewCar = async (req: Request, res: Response) => {
     }
 }
 
-const handleDeleteCar = async (req: Request, res: Response) => {
+const handleDeleteCarAndTrips = async (req: Request, res: Response) => {
     const { id } = req.body
     try {
-        const result = await deleteCar(id);
+        const result = await deleteCarAndTrips(id);
         if(result.status === 'success') {
             return res.status(200).json(result);
         }
@@ -72,6 +72,6 @@ const handleRepairCar = async (req: Request, res: Response) => {
 module.exports = {
     handleGetAllCars,
     handleCreateNewCar,
-    handleDeleteCar,
-    handleRepairCar
+    handleDeleteCarAndTrips,
+    handleRepairCar,
 }

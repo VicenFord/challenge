@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import axios from "axios"
 import Swal from 'sweetalert2';
 import {
   DropdownMenu,
@@ -13,7 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { onlyRevalidateTrips } from "../../lib/actions"
+import { revalidateTrips } from "../../lib/actions"
+import axios from "axios";
 
 export type Trips = {
     id: string
@@ -115,8 +115,9 @@ export const columns: ColumnDef<Trips>[] = [
                       if (result.isConfirmed) {
                         try{
                           const { data } = await axios.delete(`http://localhost:3001/trips`, { data: trip })
+
                           if(data?.status === "success"){
-                            onlyRevalidateTrips();
+                            revalidateTrips();
                             Swal.fire({
                               title: `Trip deleted!`,
                               icon: "success",

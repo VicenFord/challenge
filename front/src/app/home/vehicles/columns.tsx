@@ -5,8 +5,8 @@ import { ArrowUpDown, Wrench, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Swal from "sweetalert2"
-import axios from "axios"
 import { revalidateVehicles } from "@/app/lib/actions"
+import axios from "axios"
 
 export type Cars = {
     id: string
@@ -93,6 +93,7 @@ export const columns: ColumnDef<Cars>[] = [
                       if (result.isConfirmed) {
                         try{
                           const { data } = await axios.put(`http://localhost:3001/cars`, { ...car})
+
                           if(data?.status === "success"){
                             revalidateVehicles();
                             Swal.fire({
@@ -112,6 +113,42 @@ export const columns: ColumnDef<Cars>[] = [
               >
                 <Wrench className="mr-2 h-4 w-4" /> Repair
               </DropdownMenuItem>
+
+              <DropdownMenuItem style={{ color: "red", cursor: "pointer" }}
+                onClick={async () => {
+                    Swal.fire({
+                      title: 'Are you sure you want to delete this car?',
+                      text: "All the trips associated with this car will also be deleted.",
+                      icon: 'warning',
+                      confirmButtonText: 'Delete',
+                      showCancelButton: true,
+                      confirmButtonColor: '#d33',
+                      cancelButtonColor: '#3085d6'
+                    }).then(async (result) => {
+                        if(result.isConfirmed){
+                          try{
+                            const { data } = await axios.delete(`http://localhost:3001/cars`, { data: car })
+  
+                            if(data?.status === "success"){
+                              revalidateVehicles();
+                              Swal.fire({
+                                title: `Car deleted!`,
+                                icon: "success",
+                                toast: true,
+                                timer: 3000,
+                                showConfirmButton: false,
+                              });
+                            }
+                          }catch(err){
+                            console.log(err)
+                          }
+                        }
+                      })
+                  }}
+              >
+                Delete
+              </DropdownMenuItem>
+
             </DropdownMenuContent>
           </DropdownMenu>
         )
